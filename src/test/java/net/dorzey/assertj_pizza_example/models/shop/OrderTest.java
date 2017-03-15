@@ -78,4 +78,13 @@ public class OrderTest {
             .isInstanceOf(EmptyOrderException.class)
             .hasMessage("No pizzas in order.");
   }
+
+  @Test
+  public void shouldFailToDemonstrateCustomErrorMessage() throws EmptyOrderException {
+    Order order = a.order().withPizzas(
+            newArrayList(a.margheritaPizza(), a.sanDanielePizza(), a.pugliesePizza()))
+            .build();
+
+    assertThat(order.getPizzas()).as("Order should have size 4").hasSize(4);
+  }
 }
