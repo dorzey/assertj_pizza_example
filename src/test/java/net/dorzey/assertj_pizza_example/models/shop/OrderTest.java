@@ -12,6 +12,7 @@ import static net.dorzey.assertj_pizza_example.models.pizza.Topping.ONION;
 import static net.dorzey.assertj_pizza_example.models.pizza.Topping.PROSCIUTTO_DI_PARMA;
 import static net.dorzey.assertj_pizza_example.models.pizza.Topping.TOMATO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.tuple;
 
 import static net.dorzey.assertj_pizza_example.models.shop.CustomerAssert.assertThat;
@@ -52,7 +53,7 @@ public class OrderTest {
   }
 
   @Test
-  public void an_order_should_contain_the_correct_pizzas(){
+  public void an_order_should_contain_the_correct_pizzas() throws EmptyOrderException {
 
     Order order = a.order().withPizzas(
         newArrayList(a.margheritaPizza(), a.sanDanielePizza(), a.pugliesePizza(), a.deepPanPizza()))
@@ -67,4 +68,23 @@ public class OrderTest {
         );
   }
 
+  @Test
+  public void shouldThrowExceptionWhenOrderHasNoPizzas(){
+    Order order = a.order().withPizzas(newArrayList()).build();
+
+    Throwable actual = catchThrowable(order::getPizzas);
+
+    assertThat(actual).isNotNull()
+            .isInstanceOf(EmptyOrderException.class)
+            .hasMessage("No pizzas in order.");
+  }
+
+  @Test
+  public void shouldFailToDemonstrateCustomErrorMessage() throws EmptyOrderException {
+    Order order = a.order().withPizzas(
+            newArrayList(a.margheritaPizza(), a.sanDanielePizza(), a.pugliesePizza()))
+            .build();
+
+    assertThat(order.getPizzas()).as("Order should have size 4").hasSize(4);
+  }
 }
